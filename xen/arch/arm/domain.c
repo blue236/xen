@@ -150,7 +150,7 @@ static void ctxt_switch_to(struct vcpu *n)
 
     p2m_restore_state(n);
 
-    WRITE_SYSREG32(n->domain->arch.vpidr, VPIDR_EL2);
+    WRITE_SYSREG32(n->arch.vpidr, VPIDR_EL2);
     WRITE_SYSREG(n->arch.vmpidr, VMPIDR_EL2);
 
     /* VGIC */
@@ -480,6 +480,7 @@ void free_vcpu_guest_context(struct vcpu_guest_context *vgc)
 int vcpu_initialise(struct vcpu *v)
 {
     int rc = 0;
+    struct cpuinfo_arm *info;
 
     BUILD_BUG_ON( sizeof(struct cpu_info) > STACK_SIZE );
 
@@ -506,6 +507,9 @@ int vcpu_initialise(struct vcpu *v)
      * TODO: Handle multi-threading processor and cluster
      */
     v->arch.vmpidr = MPIDR_SMP | cpu_logical_map(v->vcpu_id);
+    /* Default the virtual ID to match the physical */
+    info = &cpu_data[v->vcpu_id];
+    v->arch.vpidr = info->midr.bits;
 
     v->arch.actlr = READ_SYSREG32(ACTLR_EL1);
 
@@ -547,9 +551,6 @@ int arch_domain_create(struct domain *d, unsigned int domcr_flags)
     rc = -ENOMEM;
     if ( (d->shared_info = alloc_xenheap_pages(0, 0)) == NULL )
         goto fail;
-
-    /* Default the virtual ID to match the physical */
-    d->arch.vpidr = boot_cpu_data.midr.bits;
 
     clear_page(d->shared_info);
     share_xen_page_with_guest(

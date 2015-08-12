@@ -65,9 +65,6 @@ struct arch_domain
         RELMEM_done,
     } relmem;
 
-    /* Virtual CPUID */
-    uint32_t vpidr;
-
     struct {
         uint64_t offset;
     } phys_timer_base;
@@ -207,6 +204,8 @@ struct arch_vcpu
     /* CP 15 */
     uint32_t csselr;
     register_t vmpidr;
+    /* Virtual CPUID */
+    uint32_t vpidr;
 
     /* Holds gic context data */
     union gic_state_data gic;

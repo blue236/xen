@@ -1674,7 +1674,7 @@ static void do_cp14_32(struct cpu_user_regs *regs, union hsr hsr)
 {
     struct hsr_cp32 cp32 = hsr.cp32;
     uint32_t *r = (uint32_t *)select_user_reg(regs, cp32.reg);
-    struct domain *d = current->domain;
+    struct vcpu *v = current;
 
     if ( !check_conditional_instr(regs, hsr) )
     {
@@ -1697,7 +1697,7 @@ static void do_cp14_32(struct cpu_user_regs *regs, union hsr hsr)
          *  - Variant and Revision bits match MDIR
          */
         *r = (1 << 24) | (5 << 16);
-        *r |= ((d->arch.vpidr >> 20) & 0xf) | (d->arch.vpidr & 0xf);
+        *r |= ((v->arch.vpidr >> 20) & 0xf) | (v->arch.vpidr & 0xf);
         break;
 
     case HSR_CPREG32(DBGDSCRINT):
