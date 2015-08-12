@@ -1613,6 +1613,7 @@ static void do_cp15_32(struct cpu_user_regs *regs,
     case HSR_CPREG32(PMINTENSET):
     case HSR_CPREG32(PMINTENCLR):
     case HSR_CPREG32(PMOVSSET):
+    case HSR_CPREG32(L2ACTLR):
         if ( cp32.read )
             *r = 0;
         break;
@@ -1635,6 +1636,10 @@ static void do_cp15_32(struct cpu_user_regs *regs,
 static void do_cp15_64(struct cpu_user_regs *regs,
                        union hsr hsr)
 {
+    struct hsr_cp64 cp64 = hsr.cp64;
+    uint32_t *r1 = (uint32_t*)select_user_reg(regs, cp64.reg1);
+    uint32_t *r2 = (uint32_t*)select_user_reg(regs, cp64.reg2);
+
     if ( !check_conditional_instr(regs, hsr) )
     {
         advance_pc(regs, hsr);
@@ -1651,6 +1656,15 @@ static void do_cp15_64(struct cpu_user_regs *regs,
             domain_crash_synchronous();
         }
         break;
+    case HSR_CPREG64(CPUMERRSR):
+    case HSR_CPREG64(L2MERRSR):
+        if ( cp64.read )
+        {
+            *r1 = 0;
+            *r2 = 0;
+        }
+        break;
+
     default:
         {
 #ifndef NDEBUG
