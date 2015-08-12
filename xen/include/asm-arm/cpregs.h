@@ -269,6 +269,9 @@
 #define CNTHP_CVAL      p15,6,c14       /* Hyp. Timer comparator */
 
 /* CP15 CR15: Implementation Defined Registers */
+#define L2ACTLR         p15,1,c15,c0,0  /* L2 Auxiliary Control Register */
+#define CPUMERRSR       p15,0,c15       /* CPU Memory Error Syndrome Register */
+#define L2MERRSR        p15,1,c15       /* L2 Memory Error Syndrome Register */
 
 /* Aliases of AArch64 names for use in common code when building for AArch32 */
 #ifdef CONFIG_ARM_32
