@@ -22,6 +22,21 @@
 
 #include <public/sched.h>
 
+register_t find_logical_cpu(register_t pcpu)
+{
+    int cpu;
+
+    for_each_online_cpu(cpu)
+    {
+        if(cpu_logical_map(cpu)==pcpu)
+            return cpu;
+    }
+
+    printk("%s - Can't find pcpu[%u] from cpu_logical_map\n", __func__, pcpu);
+
+    return PSCI_INVALID_PARAMETERS;
+}
+
 static int do_common_cpu_on(register_t target_cpu, register_t entry_point,
                        register_t context_id,int ver)
 {
@@ -33,9 +48,9 @@ static int do_common_cpu_on(register_t target_cpu, register_t entry_point,
     register_t vcpuid;
 
     if( ver == XEN_PSCI_V_0_2 )
-        vcpuid = (target_cpu & MPIDR_HWID_MASK);
+        vcpuid = (find_logical_cpu(target_cpu) & MPIDR_HWID_MASK);
     else
-        vcpuid = target_cpu;
+        vcpuid = find_logical_cpu(target_cpu);
 
     if ( (vcpuid < 0) || (vcpuid >= MAX_VIRT_CPUS) )
         return PSCI_INVALID_PARAMETERS;

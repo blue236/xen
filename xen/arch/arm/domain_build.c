@@ -756,7 +756,7 @@ static int make_cpus_node(const struct domain *d, void *fdt,
         if ( res )
             return res;
 
-        res = fdt_property_cell(fdt, "reg", cpu);
+        res = fdt_property_cell(fdt, "reg", cpu_logical_map(cpu));
         if ( res )
             return res;
 

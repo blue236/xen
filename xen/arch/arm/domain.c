@@ -505,7 +505,7 @@ int vcpu_initialise(struct vcpu *v)
      * By default exposes an SMP system with AFF0 set to the VCPU ID
      * TODO: Handle multi-threading processor and cluster
      */
-    v->arch.vmpidr = MPIDR_SMP | (v->vcpu_id << MPIDR_AFF0_SHIFT);
+    v->arch.vmpidr = MPIDR_SMP | cpu_logical_map(v->vcpu_id);
 
     v->arch.actlr = READ_SYSREG32(ACTLR_EL1);
 
