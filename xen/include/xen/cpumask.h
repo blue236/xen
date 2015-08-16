@@ -419,6 +419,9 @@ static inline void free_cpumask_var(cpumask_var_t mask)
 extern cpumask_t cpu_possible_map;
 extern cpumask_t cpu_online_map;
 extern cpumask_t cpu_present_map;
+#ifdef CONFIG_CPU_CLUSTER
+extern cpumask_t cpu_cluster_map[MAX_CPU_CLUSTER];
+#endif
 
 #if NR_CPUS > 1
 #define num_online_cpus()	cpumask_weight(&cpu_online_map)

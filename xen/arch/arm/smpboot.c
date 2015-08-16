@@ -35,6 +35,9 @@
 cpumask_t cpu_online_map;
 cpumask_t cpu_present_map;
 cpumask_t cpu_possible_map;
+#ifdef CONFIG_CPU_CLUSTER
+cpumask_t cpu_cluster_map[MAX_CPU_CLUSTER];
+#endif
 
 struct cpuinfo_arm cpu_data[NR_CPUS];
 
@@ -328,7 +331,7 @@ void __cpu_disable(void)
         BUG();
     smp_mb();
 
-    /* Return to caller; eventually the IPI mechanism will unwind and the 
+    /* Return to caller; eventually the IPI mechanism will unwind and the
      * scheduler will drop to the idle loop, which will call stop_cpu(). */
 }
 

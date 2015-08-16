@@ -54,6 +54,29 @@ custom_param("dom0_mem", parse_dom0_mem);
 # define D11PRINT(fmt, args...) do {} while ( 0 )
 #endif
 
+#ifdef CONFIG_CPU_CLUSTER
+#define set_cpu_cluster_map(cpu)\
+	{\
+		int cluster_id;\
+		cluster_id = MPIDR_AFFINITY_LEVEL(cpu_logical_map(cpu), 1);\
+		ASSERT(cluster_id < MAX_CPU_CLUSTER);\
+		cpumask_set_cpu(cpu, &cpu_cluster_map[cluster_id]);\
+	}
+
+#define set_cpu_cluster_affinity(d,v) \
+	for_each_vcpu(d,v)	\
+	{					\
+		int cluster_id; \
+		/* Find the cluser id of vcpu */	 \
+		cluster_id = MPIDR_AFFINITY_LEVEL(cpu_logical_map(v->processor), 1); \
+		/* Set the vcpu to the cluster affinity */									  \
+		vcpu_set_hard_affinity(v, &cpu_cluster_map[cluster_id]);			 \
+	}
+#else
+#define set_cpu_cluster_map(cpu)
+#define set_cpu_cluster_affinity(d,v)
+#endif
+
 /*
  * Amount of extra space required to dom0's device tree.  No new nodes
  * are added (yet) but one terminating reserve map entry (16 bytes) is
@@ -1375,6 +1398,7 @@ int construct_dom0(struct domain *d)
     }
 #endif
 
+    set_cpu_cluster_map(0);
     for ( i = 1, cpu = 0; i < d->max_vcpus; i++ )
     {
         cpu = cpumask_cycle(cpu, &cpu_online_map);
@@ -1383,7 +1407,9 @@ int construct_dom0(struct domain *d)
             printk("Failed to allocate dom0 vcpu %d on pcpu %d\n", i, cpu);
             break;
         }
+        set_cpu_cluster_map(cpu);
     }
+	set_cpu_cluster_affinity(d,v);
 
     return 0;
 }

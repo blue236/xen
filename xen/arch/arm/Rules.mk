@@ -34,6 +34,10 @@ arm32 := n
 arm64 := y
 endif
 
+ifeq ($(HAS_CPU_CLUSTER),y)
+CFLAGS += -DCONFIG_CPU_CLUSTER
+endif
+
 ifneq ($(call cc-option,$(CC),-fvisibility=hidden,n),n)
 CFLAGS += -DGCC_HAS_VISIBILITY_ATTRIBUTE
 endif

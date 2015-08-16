@@ -50,6 +50,11 @@
 #define MAX_VIRT_CPUS 8
 #define MAX_HVM_VCPUS MAX_VIRT_CPUS
 
+#ifdef CONFIG_CPU_CLUSTER
+/* Define maximum cpu cluster */
+#define MAX_CPU_CLUSTER 2
+#endif
+
 #define asmlinkage /* Nothing needed */
 
 #define __LINUX_ARM_ARCH__ 7
